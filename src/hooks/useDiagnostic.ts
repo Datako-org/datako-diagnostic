@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import {
   DiagnosticFormData,
   DiagnosticAnswer,
@@ -64,6 +64,10 @@ export const useDiagnostic = () => {
   const prevStep = useCallback(() => {
     setCurrentStep(prev => Math.max(0, prev - 1));
   }, []);
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [currentStep]);
 
   const goToStep = useCallback((step: number) => {
     setCurrentStep(step);

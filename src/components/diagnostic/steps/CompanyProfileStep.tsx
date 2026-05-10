@@ -147,7 +147,7 @@ export const CompanyProfileStep = ({
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="transport">Transport uniquement</SelectItem>
-                  <SelectItem value="vente">Vente de carburant uniquement</SelectItem>
+                  <SelectItem value="vente">Vente uniquement</SelectItem>
                   <SelectItem value="mixte">Transport + Vente</SelectItem>
                   <SelectItem value="autre">Autre</SelectItem>
                 </SelectContent>
