@@ -160,7 +160,11 @@
 @media print {
   .no-print { display: none !important; }
 
-  body { background: white !important; color: black !important; }
+  body {
+    background: white !important;
+    color: black !important;
+    padding: 2cm;
+  }
 
   header .no-print,
   footer,
@@ -180,6 +184,6 @@
 
   @page {
     size: A4;
-    margin: 2cm;
+    margin: 0;
   }
 }
