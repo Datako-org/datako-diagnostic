@@ -80,7 +80,7 @@ export const handler = async (event: NetlifyEvent): Promise<NetlifyResponse> => 
     return { statusCode: 200, headers: corsHeaders, body: JSON.stringify({ success: true }) };
   }
 
-  // ── DELETE — soft delete bulk ─────────────────────────────────────────────
+  // ── DELETE — soft delete bulk or permanent delete ────────────────────────
   if (event.httpMethod === 'DELETE') {
     let body: Record<string, unknown> = {};
     try {
@@ -92,6 +92,14 @@ export const handler = async (event: NetlifyEvent): Promise<NetlifyResponse> => 
     const ids = body.ids as string[];
     if (!Array.isArray(ids) || ids.length === 0) {
       return { statusCode: 400, headers: corsHeaders, body: JSON.stringify({ error: 'Missing or empty ids' }) };
+    }
+
+    if (body.permanent === true) {
+      const { error } = await supabase.from('diagnostics').delete().in('id', ids);
+      if (error) {
+        return { statusCode: 500, headers: corsHeaders, body: JSON.stringify({ error: error.message }) };
+      }
+      return { statusCode: 200, headers: corsHeaders, body: JSON.stringify({ success: true, count: ids.length }) };
     }
 
     const { error } = await supabase

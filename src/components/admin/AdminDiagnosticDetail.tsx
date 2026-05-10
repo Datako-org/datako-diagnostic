@@ -100,6 +100,8 @@ const AdminDiagnosticDetail = ({ diagnostic, onClose, password, onUpdate, onDele
   const [isDeleting, setIsDeleting] = useState(false);
   const [showRestoreConfirm, setShowRestoreConfirm] = useState(false);
   const [isRestoring, setIsRestoring] = useState(false);
+  const [showHardDeleteConfirm, setShowHardDeleteConfirm] = useState(false);
+  const [isHardDeleting, setIsHardDeleting] = useState(false);
 
   // Reset CRM state when a new diagnostic is opened
   useEffect(() => {
@@ -211,6 +213,27 @@ const AdminDiagnosticDetail = ({ diagnostic, onClose, password, onUpdate, onDele
     }
   };
 
+  const handleHardDelete = async () => {
+    if (!diagnostic) return;
+    setIsHardDeleting(true);
+    try {
+      const res = await fetch('/.netlify/functions/admin-diagnostics', {
+        method: 'DELETE',
+        headers: { 'x-admin-password': password, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids: [diagnostic.id], permanent: true }),
+      });
+      if (!res.ok) throw new Error('Hard delete failed');
+      toast.success('Diagnostic supprimé définitivement');
+      onDelete(diagnostic.id);
+      onClose();
+    } catch {
+      toast.error('Erreur lors de la suppression définitive');
+    } finally {
+      setIsHardDeleting(false);
+      setShowHardDeleteConfirm(false);
+    }
+  };
+
   const isDeleted = !!(diagnostic?.deleted_at);
   const sector = detail?.organizations?.sector ?? diagnostic?.sector ?? '';
   const maturityLevel = (detail?.maturity_level ?? diagnostic?.maturity_level ?? 'debutant') as MaturityLevel;
@@ -310,14 +333,25 @@ const AdminDiagnosticDetail = ({ diagnostic, onClose, password, onUpdate, onDele
 
                 <div className="pt-2">
                   {isDeleted ? (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="gap-2 border-green-500/50 text-green-500 hover:bg-green-500/10 hover:text-green-400"
-                      onClick={() => setShowRestoreConfirm(true)}
-                    >
-                      ♻️ Restaurer ce diagnostic
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="gap-2 border-green-500/50 text-green-500 hover:bg-green-500/10 hover:text-green-400"
+                        onClick={() => setShowRestoreConfirm(true)}
+                      >
+                        ♻️ Restaurer ce diagnostic
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        className="gap-2"
+                        onClick={() => setShowHardDeleteConfirm(true)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        Supprimer définitivement
+                      </Button>
+                    </div>
                   ) : (
                     <Button
                       variant="destructive"
@@ -447,6 +481,28 @@ const AdminDiagnosticDetail = ({ diagnostic, onClose, password, onUpdate, onDele
           >
             {isDeleting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
             Supprimer
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+
+    <AlertDialog open={showHardDeleteConfirm} onOpenChange={setShowHardDeleteConfirm}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Supprimer définitivement ?</AlertDialogTitle>
+          <AlertDialogDescription>
+            Cette action est irréversible. Le diagnostic sera effacé de la base de données et ne pourra pas être restauré.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel disabled={isHardDeleting}>Annuler</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={handleHardDelete}
+            disabled={isHardDeleting}
+            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+          >
+            {isHardDeleting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+            Supprimer définitivement
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
