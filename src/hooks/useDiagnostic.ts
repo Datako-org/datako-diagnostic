@@ -139,7 +139,7 @@ export const useDiagnostic = () => {
     };
   }, [formData]);
 
-  const submitDiagnostic = useCallback(async () => {
+  const submitDiagnostic = useCallback(async (additionalNeed?: string) => {
     setIsSubmitting(true);
     console.log('Diagnostic submission started', {
       organization: formData.organization,
@@ -191,6 +191,7 @@ export const useDiagnostic = () => {
           axis_scores: JSON.parse(JSON.stringify(calculatedResult.dimensionScores)),
           status: 'completed',
           completed_at: new Date().toISOString(),
+          ...(additionalNeed ? { additional_need: additionalNeed } : {}),
         }])
         .select()
         .single();

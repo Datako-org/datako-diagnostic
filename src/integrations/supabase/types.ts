@@ -58,6 +58,7 @@ export type Database = {
       }
       diagnostics: {
         Row: {
+          additional_need: string | null
           axis_scores: Json
           completed_at: string | null
           created_at: string
@@ -70,6 +71,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          additional_need?: string | null
           axis_scores?: Json
           completed_at?: string | null
           created_at?: string
@@ -82,6 +84,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          additional_need?: string | null
           axis_scores?: Json
           completed_at?: string | null
           created_at?: string

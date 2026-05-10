@@ -5,6 +5,7 @@ import { ProgressBar } from '@/components/diagnostic/ProgressBar';
 import { CompanyProfileStep } from '@/components/diagnostic/steps/CompanyProfileStep';
 import { QuestionStep } from '@/components/diagnostic/steps/QuestionStep';
 import { ContactStep } from '@/components/diagnostic/steps/ContactStep';
+import { NeedsStep } from '@/components/diagnostic/steps/NeedsStep';
 import { ResultsPage } from '@/components/diagnostic/ResultsPage';
 
 const STEP_TITLES: Record<number, { title: string; subtitle?: string }> = {
@@ -28,8 +29,8 @@ const Index = () => {
     resetDiagnostic,
   } = useDiagnostic();
 
-  // Total steps: contexte (1) + données (2) + pilotage (3) + automatisation (4) + contact (5)
-  const totalSteps = 5;
+  // Total steps: contexte (1) + données (2) + pilotage (3) + automatisation (4) + contact (5) + besoin (6)
+  const totalSteps = 6;
 
   // Step 0: Landing page
   if (currentStep === 0) {
@@ -66,8 +67,21 @@ const Index = () => {
         <ContactStep
           data={formData.respondent}
           onUpdate={updateRespondent}
-          onSubmit={submitDiagnostic}
+          onSubmit={nextStep}
           onPrev={prevStep}
+          isSubmitting={isSubmitting}
+        />
+      </div>
+    );
+  }
+
+  // Step 6: Besoin complémentaire
+  if (currentStep === 6) {
+    return (
+      <div className="min-h-screen bg-background">
+        <ProgressBar currentStep={currentStep} totalSteps={totalSteps} />
+        <NeedsStep
+          onSubmit={submitDiagnostic}
           isSubmitting={isSubmitting}
         />
       </div>

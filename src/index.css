@@ -156,3 +156,30 @@
 ::-webkit-scrollbar-thumb:hover {
   background: hsl(var(--muted-foreground));
 }
+
+@media print {
+  .no-print { display: none !important; }
+
+  body { background: white !important; color: black !important; }
+
+  header .no-print,
+  footer,
+  [role="dialog"] { display: none !important; }
+
+  .bg-card { background: white !important; border: 1px solid #e5e7eb !important; }
+  .gradient-datako-text { color: #7c3aed !important; -webkit-text-fill-color: #7c3aed !important; }
+
+  main::after {
+    content: "Datakö  •  contact@datako.com";
+    display: block;
+    text-align: center;
+    margin-top: 2rem;
+    font-size: 0.75rem;
+    color: #6b7280;
+  }
+
+  @page {
+    size: A4;
+    margin: 2cm;
+  }
+}
