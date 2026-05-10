@@ -35,6 +35,7 @@ interface DetailData {
   total_score: number;
   crm_status: CrmStatus;
   internal_notes: string | null;
+  additional_need: string | null;
 }
 
 interface AdminDiagnosticDetailProps {
@@ -131,6 +132,7 @@ const AdminDiagnosticDetail = ({ diagnostic, onClose, password, onUpdate, onDele
           total_score: raw.total_score,
           crm_status: raw.crm_status ?? 'new',
           internal_notes: raw.internal_notes ?? null,
+          additional_need: raw.additional_need ?? null,
         });
         // Sync notes from server
         setLocalNotes(raw.internal_notes ?? '');
@@ -360,6 +362,15 @@ const AdminDiagnosticDetail = ({ diagnostic, onClose, password, onUpdate, onDele
                   <InfoRow label="Poste" value={ROLE_LABELS[detail.respondents?.role ?? ''] ?? detail.respondents?.role} />
                 </dl>
               </div>
+              {detail.additional_need && (
+                <>
+                  <Separator />
+                  <div>
+                    <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">Besoin exprimé</h3>
+                    <p className="text-sm italic text-foreground/80">{detail.additional_need}</p>
+                  </div>
+                </>
+              )}
             </TabsContent>
 
             {/* ── SCORES ── */}

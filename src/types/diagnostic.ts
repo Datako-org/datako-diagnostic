@@ -110,6 +110,7 @@ export interface DiagnosticFormData {
   organization: Organization;
   respondent: Respondent;
   answers: Record<string, DiagnosticAnswer>;
+  additionalNeed?: string;
 }
 
 export interface Question {
