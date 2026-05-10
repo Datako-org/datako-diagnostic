@@ -64,6 +64,11 @@ export interface Organization {
   sector: string;
   country: string;
   size: string;
+  // Transport qualification fields (not scored)
+  activity_type?: string;
+  product_type?: string;
+  fleet_size?: string;
+  fleet_ownership?: string;
 }
 
 export interface Respondent {
@@ -105,6 +110,7 @@ export interface DiagnosticFormData {
   organization: Organization;
   respondent: Respondent;
   answers: Record<string, DiagnosticAnswer>;
+  additionalNeed?: string;
 }
 
 export interface Question {
@@ -157,6 +163,8 @@ export const ROLES = [
 
 export const COUNTRIES = [
   { value: 'guinée', label: 'Guinée' },
+  { value: 'sénégal', label: 'Sénégal' },
+  { value: 'côte d\'ivoire', label: 'Côte d\'Ivoire' },
   { value: 'france', label: 'France' },
   { value: 'other', label: 'Autre' },
 ] as const;

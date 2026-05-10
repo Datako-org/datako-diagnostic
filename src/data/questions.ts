@@ -1,10 +1,12 @@
 import { Question } from '@/types/diagnostic';
 
 // ============================================================
-// TRANSPORT & LOGISTIQUE - Diagnostic sectoriel complet
+// TRANSPORT & LOGISTIQUE - Diagnostic terrain (retours EGUITRA, TRANSPETROL)
+// Qualification dans CompanyProfileStep, questions scorées ci-dessous
 // ============================================================
 
-// Bloc 1 - État des données (Q1-Q4)
+// Bloc 1 - État des données (step 2, dimension "data")
+// 2 questions conservées de l'ancien diagnostic + 2 nouvelles terrain
 const transportDataQuestions: Question[] = [
   {
     id: 'tl_q1',
@@ -28,22 +30,6 @@ const transportDataQuestions: Question[] = [
     step: 2,
     dimension: 'data',
     sector: 'transport',
-    question_text: 'Comment planifiez-vous et suivez-vous les maintenances de vos véhicules ?',
-    question_type: 'single_choice',
-    options: [
-      { label: 'Maintenance réactive (on répare quand ça casse)', value: 'reactive', score: 0 },
-      { label: 'Carnet papier ou mémoire', value: 'paper', score: 20 },
-      { label: 'Planning manuel dans Excel/agenda', value: 'manual_planning', score: 50 },
-      { label: 'Système automatisé avec alertes (basé sur km/temps)', value: 'automated', score: 100 },
-    ],
-    max_score: 100,
-    order_index: 2,
-  },
-  {
-    id: 'tl_q3',
-    step: 2,
-    dimension: 'data',
-    sector: 'transport',
     question_text: 'Vos équipes peuvent-elles accéder facilement aux données dont elles ont besoin ?',
     question_type: 'single_choice',
     options: [
@@ -53,6 +39,22 @@ const transportDataQuestions: Question[] = [
       { label: 'Oui, données accessibles en temps réel (mobile/web)', value: 'realtime', score: 100 },
     ],
     max_score: 100,
+    order_index: 2,
+  },
+  {
+    id: 'tl_q3',
+    step: 2,
+    dimension: 'data',
+    sector: 'transport',
+    question_text: 'Les coûts varient-ils selon la destination ? (carburant, primes chauffeur, péages)',
+    question_type: 'single_choice',
+    options: [
+      { label: 'Pas sûr', value: 'unsure', score: 10 },
+      { label: 'Non', value: 'no', score: 30 },
+      { label: 'Oui', value: 'yes', score: 60 },
+      { label: 'Oui et on les suit précisément', value: 'yes_tracked', score: 100 },
+    ],
+    max_score: 100,
     order_index: 3,
   },
   {
@@ -60,33 +62,34 @@ const transportDataQuestions: Question[] = [
     step: 2,
     dimension: 'data',
     sector: 'transport',
-    question_text: 'Pouvez-vous retrouver l\'historique complet d\'un véhicule (maintenance, coûts, incidents, trajets) ?',
+    question_text: 'Comment répartissez-vous les revenus entre partenaires / parties prenantes ?',
     question_type: 'single_choice',
     options: [
-      { label: 'Non, très difficile ou impossible', value: 'no', score: 0 },
-      { label: 'Partiellement, il manque souvent des infos', value: 'partial', score: 20 },
-      { label: 'Oui, mais en cherchant dans plusieurs fichiers', value: 'multiple_files', score: 40 },
-      { label: 'Oui, immédiatement dans un système', value: 'instant', score: 100 },
+      { label: 'Pas de répartition formalisée', value: 'none', score: 0 },
+      { label: 'Calcul manuel à chaque livraison', value: 'manual', score: 25 },
+      { label: 'Excel avec formules', value: 'excel', score: 50 },
+      { label: 'Système automatisé', value: 'automated', score: 100 },
     ],
     max_score: 100,
     order_index: 4,
   },
 ];
 
-// Bloc 2 - Pilotage & Performance (Q5-Q8)
+// Bloc 2 - Pilotage & Performance (step 3, dimension "pilotage")
 const transportPilotageQuestions: Question[] = [
   {
     id: 'tl_q5',
     step: 3,
     dimension: 'pilotage',
     sector: 'transport',
-    question_text: 'Suivez-vous vos coûts par véhicule et/ou par trajet ?',
+    question_text: 'Comment suivez-vous aujourd\'hui l\'activité de vos camions ?',
     question_type: 'single_choice',
     options: [
-      { label: 'Non, pas de suivi détaillé des coûts', value: 'no', score: 0 },
-      { label: 'Estimation approximative', value: 'estimate', score: 30 },
-      { label: 'Oui, mais calcul manuel mensuel', value: 'manual_monthly', score: 60 },
-      { label: 'Oui, calcul automatique et suivi en temps réel', value: 'auto_realtime', score: 100 },
+      { label: 'Pas de suivi structuré', value: 'none', score: 0 },
+      { label: 'WhatsApp / téléphone', value: 'whatsapp', score: 15 },
+      { label: 'Papier / cahier', value: 'paper', score: 25 },
+      { label: 'Excel', value: 'excel', score: 50 },
+      { label: 'Logiciel dédié', value: 'software', score: 100 },
     ],
     max_score: 100,
     order_index: 1,
@@ -96,13 +99,13 @@ const transportPilotageQuestions: Question[] = [
     step: 3,
     dimension: 'pilotage',
     sector: 'transport',
-    question_text: 'Comment créez-vous vos reportings d\'activité (flotte, coûts, performance) ?',
+    question_text: 'Savez-vous aujourd\'hui quel camion est le plus rentable dans votre flotte ?',
     question_type: 'single_choice',
     options: [
-      { label: 'Pas de reporting structuré', value: 'none', score: 0 },
-      { label: 'Rapports basiques occasionnels', value: 'basic', score: 20 },
-      { label: 'Compilation manuelle Excel (prend plusieurs heures)', value: 'manual_excel', score: 40 },
-      { label: 'Dashboard automatisé mis à jour en temps réel', value: 'auto_dashboard', score: 100 },
+      { label: 'Non', value: 'no', score: 0 },
+      { label: 'Pas précisément', value: 'not_precise', score: 30 },
+      { label: 'Oui, approximativement', value: 'approximate', score: 60 },
+      { label: 'Oui, avec des chiffres précis', value: 'precise', score: 100 },
     ],
     max_score: 100,
     order_index: 2,
@@ -112,13 +115,13 @@ const transportPilotageQuestions: Question[] = [
     step: 3,
     dimension: 'pilotage',
     sector: 'transport',
-    question_text: 'Suivez-vous des KPIs opérationnels (taux de disponibilité, coût au km, délais de livraison, etc.) ?',
+    question_text: 'Comment savez-vous combien vous avez gagné après chaque rotation ?',
     question_type: 'single_choice',
     options: [
-      { label: 'Non, pas de KPIs définis', value: 'no', score: 0 },
-      { label: 'Quelques indicateurs basiques', value: 'basic', score: 25 },
-      { label: 'Oui, mais calcul manuel et irrégulier', value: 'manual_irregular', score: 50 },
-      { label: 'Oui, KPIs suivis régulièrement et pilotés', value: 'regular_tracked', score: 100 },
+      { label: 'On ne sait pas en temps réel', value: 'no_realtime', score: 0 },
+      { label: 'Le chef logistique calcule manuellement', value: 'manual', score: 25 },
+      { label: 'On attend le bilan mensuel', value: 'monthly', score: 40 },
+      { label: 'On a un outil qui calcule instantanément', value: 'instant', score: 100 },
     ],
     max_score: 100,
     order_index: 3,
@@ -128,20 +131,20 @@ const transportPilotageQuestions: Question[] = [
     step: 3,
     dimension: 'pilotage',
     sector: 'transport',
-    question_text: 'Comment prenez-vous vos décisions opérationnelles (achat véhicule, choix prestataire, optimisation routes) ?',
+    question_text: 'À quelle fréquence suivez-vous la rentabilité de vos opérations ?',
     question_type: 'single_choice',
     options: [
-      { label: 'Décisions rapides sans analyse approfondie', value: 'no_analysis', score: 10 },
-      { label: 'Principalement expérience et intuition', value: 'experience', score: 30 },
-      { label: 'Mix data + expérience terrain', value: 'mixed', score: 70 },
-      { label: 'Analyses data systématiques (data-driven)', value: 'data_driven', score: 100 },
+      { label: 'Rarement', value: 'rarely', score: 0 },
+      { label: 'Une fois par mois', value: 'monthly', score: 30 },
+      { label: 'Une fois par semaine', value: 'weekly', score: 60 },
+      { label: 'Après chaque livraison', value: 'per_delivery', score: 100 },
     ],
     max_score: 100,
     order_index: 4,
   },
 ];
 
-// Bloc 3 - Automatisation & IA (Q9-Q10)
+// Bloc 3 - Automatisation & IA (step 4, dimension "automation") — inchangé
 const transportAutomationQuestions: Question[] = [
   {
     id: 'tl_q9',

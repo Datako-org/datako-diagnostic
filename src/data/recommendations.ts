@@ -8,41 +8,40 @@ type MaturityLevel = 'debutant' | 'intermediaire' | 'avance' | 'expert';
 
 const transportRecommendations: Record<MaturityLevel, SectorRecommendation> = {
   debutant: {
-    title: 'Votre priorité absolue : Centraliser vos données de flotte',
+    title: 'Votre priorité : centraliser vos données et voir la rentabilité de chaque camion en temps réel',
     actions: [
-      'Centraliser toutes vos données dans une base unique (véhicules, maintenance, coûts, trajets)',
-      'Créer un dashboard simple de suivi de votre flotte',
-      'Automatiser l\'import des nouvelles données (carburant, maintenance, km)',
+      'Centraliser les données de chaque rotation (revenus, coûts carburant, primes, péages)',
+      'Voir instantanément le gain net après chaque livraison',
+      'Fleet Manager vous permet de saisir une rotation et voir immédiatement votre marge',
     ],
-    impact: 'Gain de temps : 8-12h/semaine | Visibilité immédiate sur vos coûts réels | Détection rapide des anomalies',
+    impact: 'Visibilité immédiate sur la rentabilité par camion | Fin des surprises en fin de mois | Décisions basées sur des chiffres réels',
   },
   intermediaire: {
-    title: 'Vous avez les bases. Passez à l\'optimisation data-driven',
+    title: 'Vous avez les bases. Passez au suivi automatique des gains par rotation et par camion',
     actions: [
-      'Analyser vos coûts en profondeur (par véhicule, par km, par trajet)',
-      'Automatiser vos reportings mensuels et hebdomadaires',
-      'Détecter les opportunités d\'optimisation (véhicules sous-utilisés, surconsommation)',
+      'Automatiser le calcul des marges par rotation et par camion',
+      'Suivre les commissions et répartitions entre partenaires en un clic',
+      'Fleet Manager calcule vos marges, commissions et répartitions automatiquement',
     ],
-    impact: 'ROI : 10-15% de réduction des coûts opérationnels | Pilotage basé sur la data | Réactivité plus rapide sur les dérives',
+    impact: 'Gain de temps : plus de calculs manuels | Transparence totale avec vos partenaires | Pilotage hebdomadaire de la rentabilité',
   },
   avance: {
-    title: 'Excellent niveau. Passez à l\'IA prédictive et automatisation avancée',
+    title: 'Excellent niveau. Optimisez avec le cockpit analytique avancé',
     actions: [
-      'Mettre en place la prédiction de maintenance (anticiper les pannes)',
-      'Déployer l\'optimisation automatique des routes et tournées',
-      'Activer la détection d\'anomalies en temps réel (coûts, consommation)',
-      'Automatiser complètement les workflows de gestion de flotte',
+      'Analyser le profit par camion sur la durée',
+      'Mettre en place un cashflow prévisionnel',
+      'Préparer des rapports investisseur et simulation de croissance',
     ],
-    impact: 'Réduction significative des pannes non prévues | 5-10% d\'économies supplémentaires | Automatisation des tâches répétitives',
+    impact: 'Optimisation fine de votre flotte | Anticipation du cashflow | Données prêtes pour convaincre investisseurs et banques',
   },
   expert: {
-    title: 'Vous êtes au top. Explorez l\'innovation continue',
+    title: 'Vous êtes au top. Explorez l\'automatisation avancée',
     actions: [
-      'Benchmarking sectoriel (comparer vos KPIs aux standards du marché)',
-      'Innovation IA avancée (jumeaux numériques, simulations de scénarios)',
-      'Écosystème data étendu (intégration partenaires, supply chain, clients)',
+      'Saisie des rotations via WhatsApp (envoi automatique)',
+      'Alertes saisonnalité et optimisation des routes',
+      'Rapports investisseur automatiques et tableaux de bord temps réel',
     ],
-    impact: 'Innovation continue et amélioration constante | Avantage concurrentiel durable | Optimisation maximale des opérations',
+    impact: 'Automatisation complète du suivi | Gain de temps maximal | Excellence opérationnelle et avantage concurrentiel',
   },
 };
 

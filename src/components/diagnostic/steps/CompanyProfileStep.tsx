@@ -29,7 +29,9 @@ export const CompanyProfileStep = ({
   onNext,
   onPrev,
 }: CompanyProfileStepProps) => {
-  const isValid = data.name && data.sector && data.country && data.size && role;
+  const isTransport = data.sector === 'transport';
+  const isValid = data.name && data.sector && data.country && data.size && role
+    && (!isTransport || (data.activity_type && data.product_type && data.fleet_size && data.fleet_ownership));
 
   return (
     <motion.div
@@ -127,6 +129,76 @@ export const CompanyProfileStep = ({
             </SelectContent>
           </Select>
         </div>
+
+        {/* Transport qualification fields */}
+        {isTransport && (
+          <>
+            <div className="pt-4 border-t border-border">
+              <p className="text-sm font-medium text-muted-foreground mb-4">
+                Informations spécifiques Transport
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Activité principale *</Label>
+              <Select value={data.activity_type || ''} onValueChange={(value) => onUpdate({ activity_type: value })}>
+                <SelectTrigger className="bg-input border-border">
+                  <SelectValue placeholder="Sélectionnez votre activité" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="transport">Transport uniquement</SelectItem>
+                  <SelectItem value="vente">Vente uniquement</SelectItem>
+                  <SelectItem value="mixte">Transport + Vente</SelectItem>
+                  <SelectItem value="autre">Autre</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Type de produits transportés *</Label>
+              <Select value={data.product_type || ''} onValueChange={(value) => onUpdate({ product_type: value })}>
+                <SelectTrigger className="bg-input border-border">
+                  <SelectValue placeholder="Sélectionnez le type de produit" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="carburants">Carburants / hydrocarbures</SelectItem>
+                  <SelectItem value="marchandises">Marchandises générales</SelectItem>
+                  <SelectItem value="materiaux">Matériaux de construction</SelectItem>
+                  <SelectItem value="minerais">Minerais</SelectItem>
+                  <SelectItem value="autre">Autre</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Taille de la flotte *</Label>
+              <Select value={data.fleet_size || ''} onValueChange={(value) => onUpdate({ fleet_size: value })}>
+                <SelectTrigger className="bg-input border-border">
+                  <SelectValue placeholder="Nombre de camions" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1-5">1-5 camions</SelectItem>
+                  <SelectItem value="6-15">6-15 camions</SelectItem>
+                  <SelectItem value="16-50">16-50 camions</SelectItem>
+                  <SelectItem value="50+">50+ camions</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Propriété des camions *</Label>
+              <Select value={data.fleet_ownership || ''} onValueChange={(value) => onUpdate({ fleet_ownership: value })}>
+                <SelectTrigger className="bg-input border-border">
+                  <SelectValue placeholder="Sélectionnez" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="own">Oui, tous nos propres camions</SelectItem>
+                  <SelectItem value="partners">Non, certains appartiennent à des partenaires</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </>
+        )}
       </div>
 
       {/* Navigation */}

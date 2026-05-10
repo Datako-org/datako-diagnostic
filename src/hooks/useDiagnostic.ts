@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import {
   DiagnosticFormData,
   DiagnosticAnswer,
@@ -64,6 +64,10 @@ export const useDiagnostic = () => {
   const prevStep = useCallback(() => {
     setCurrentStep(prev => Math.max(0, prev - 1));
   }, []);
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [currentStep]);
 
   const goToStep = useCallback((step: number) => {
     setCurrentStep(step);
@@ -139,7 +143,7 @@ export const useDiagnostic = () => {
     };
   }, [formData]);
 
-  const submitDiagnostic = useCallback(async () => {
+  const submitDiagnostic = useCallback(async (additionalNeed?: string) => {
     setIsSubmitting(true);
     console.log('Diagnostic submission started', {
       organization: formData.organization,
@@ -191,6 +195,7 @@ export const useDiagnostic = () => {
           axis_scores: JSON.parse(JSON.stringify(calculatedResult.dimensionScores)),
           status: 'completed',
           completed_at: new Date().toISOString(),
+          ...(additionalNeed ? { additional_need: additionalNeed } : {}),
         }])
         .select()
         .single();
@@ -204,6 +209,27 @@ export const useDiagnostic = () => {
         answer_value: answer.value,
         score: answer.score,
       }));
+
+      // Store transport qualification data as answers (not scored)
+      if (formData.organization.sector === 'transport') {
+        const org = formData.organization;
+        const qualFields = [
+          { id: 'tl_qual_activity', value: org.activity_type },
+          { id: 'tl_qual_product', value: org.product_type },
+          { id: 'tl_qual_fleet_size', value: org.fleet_size },
+          { id: 'tl_qual_fleet_ownership', value: org.fleet_ownership },
+        ];
+        qualFields.forEach(f => {
+          if (f.value) {
+            answersToInsert.push({
+              diagnostic_id: diagnosticData.id,
+              question_id: f.id,
+              answer_value: f.value,
+              score: 0,
+            });
+          }
+        });
+      }
 
       if (answersToInsert.length > 0) {
         const { error: answersError } = await supabase

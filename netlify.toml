@@ -9,7 +9,3 @@
   port = 9999
   autoLaunch = false
 
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200

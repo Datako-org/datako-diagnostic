@@ -1,8 +1,10 @@
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { DiagnosticResult } from '@/types/diagnostic';
 import { getRecommendations, getMaturityLabel, getMaturityColor } from '@/data/recommendations';
 import { motion } from 'framer-motion';
-import { RotateCcw, Calendar, FileText, CheckCircle2, TrendingUp, Zap } from 'lucide-react';
+import { RotateCcw, Calendar, FileText, CheckCircle2, TrendingUp, Zap, Download, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface ResultsPageProps {
@@ -17,6 +19,7 @@ const DIMENSION_ICONS: Record<string, React.ReactNode> = {
 };
 
 export const ResultsPage = ({ result, onRestart }: ResultsPageProps) => {
+  const [scoringOpen, setScoringOpen] = useState(false);
   const maturityLabel = getMaturityLabel(result.maturityLevel);
   const maturityColor = getMaturityColor(result.maturityLevel);
   const recommendation = getRecommendations(result.sector, result.maturityLevel);
@@ -54,10 +57,16 @@ export const ResultsPage = ({ result, onRestart }: ResultsPageProps) => {
           <div className="text-2xl font-display font-bold gradient-datako-text">
             Datakö
           </div>
-          <Button variant="outline" onClick={onRestart} className="border-border">
-            <RotateCcw className="mr-2 h-4 w-4" />
-            Nouveau diagnostic
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" className="no-print border-border" onClick={() => window.print()}>
+              <Download className="mr-2 h-4 w-4" />
+              Télécharger mon diagnostic
+            </Button>
+            <Button variant="outline" onClick={onRestart} className="no-print border-border">
+              <RotateCcw className="mr-2 h-4 w-4" />
+              Nouveau diagnostic
+            </Button>
+          </div>
         </div>
       </header>
 
@@ -92,14 +101,24 @@ export const ResultsPage = ({ result, onRestart }: ResultsPageProps) => {
             </div>
 
             {/* Maturity Level Badge */}
-            <div className={cn(
-              "inline-flex items-center gap-2 px-6 py-3 rounded-full border",
-              maturityColor.bg,
-              maturityColor.border
-            )}>
-              <span className={cn("text-lg font-semibold", maturityColor.text)}>
-                Niveau : {maturityLabel}
-              </span>
+            <div className="flex items-center justify-center gap-2">
+              <div className={cn(
+                "inline-flex items-center gap-2 px-6 py-3 rounded-full border",
+                maturityColor.bg,
+                maturityColor.border
+              )}>
+                <span className={cn("text-lg font-semibold", maturityColor.text)}>
+                  Niveau : {maturityLabel}
+                </span>
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="no-print"
+                onClick={() => setScoringOpen(true)}
+              >
+                <Info className="h-4 w-4" />
+              </Button>
             </div>
           </motion.div>
 
@@ -204,32 +223,70 @@ export const ResultsPage = ({ result, onRestart }: ResultsPageProps) => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-            className="bg-card rounded-xl p-8 border border-border"
+            transition={{ delay: 0.45 }}
+            className={cn(
+              "bg-card rounded-xl p-8 border",
+              result.sector === 'transport' ? "border-green-500/30" : "border-border"
+            )}
           >
-            <h2 className="text-xl font-semibold mb-4 text-center">
-              Passez à l'action
-            </h2>
-            <p className="text-muted-foreground text-center mb-6">
-              Un expert Datakö vous contactera sous 48h avec une analyse détaillée et un plan d'action personnalisé.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Button
-                className="gradient-datako text-primary-foreground hover:opacity-90"
-                onClick={handleContactEmail}
-              >
-                <Calendar className="mr-2 h-4 w-4" />
-                Prendre rendez-vous (Email)
-              </Button>
-              <Button
-                variant="outline"
-                className="border-green-500 text-green-500 hover:bg-green-500/10"
-                onClick={handleContactWhatsApp}
-              >
-                <Calendar className="mr-2 h-4 w-4" />
-                WhatsApp
-              </Button>
-            </div>
+            {result.sector === 'transport' ? (
+              <>
+                <h2 className="text-xl font-semibold mb-2 text-center">
+                  Fleet Manager par Datakö
+                </h2>
+                <p className="text-muted-foreground text-center mb-6">
+                  Saisissez une rotation, voyez instantanément votre gain net. Marges, commissions, répartitions — tout est calculé pour vous.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                  <Button
+                    className="bg-green-600 text-white hover:bg-green-700"
+                    onClick={() => {
+                      const message = encodeURIComponent(
+                        `Bonjour,\n\nSuite à mon diagnostic Datakö (score : ${result.percentage}%, niveau : ${maturityLabel}), je souhaite réserver une démo Fleet Manager.\n\nMerci !`
+                      );
+                      window.open(`https://wa.me/+224612434545?text=${message}`, '_blank');
+                    }}
+                  >
+                    <Calendar className="mr-2 h-4 w-4" />
+                    Réserver une démo Fleet Manager
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="border-border"
+                    onClick={handleContactEmail}
+                  >
+                    <Calendar className="mr-2 h-4 w-4" />
+                    Nous contacter par Email
+                  </Button>
+                </div>
+              </>
+            ) : (
+              <>
+                <h2 className="text-xl font-semibold mb-4 text-center">
+                  Passez à l'action
+                </h2>
+                <p className="text-muted-foreground text-center mb-6">
+                  Un expert Datakö vous contactera sous 48h avec une analyse détaillée et un plan d'action personnalisé.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                  <Button
+                    className="gradient-datako text-primary-foreground hover:opacity-90"
+                    onClick={handleContactEmail}
+                  >
+                    <Calendar className="mr-2 h-4 w-4" />
+                    Prendre rendez-vous (Email)
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="border-green-500 text-green-500 hover:bg-green-500/10"
+                    onClick={handleContactWhatsApp}
+                  >
+                    <Calendar className="mr-2 h-4 w-4" />
+                    WhatsApp
+                  </Button>
+                </div>
+              </>
+            )}
           </motion.div>
 
           {/* Footer link */}
@@ -248,8 +305,81 @@ export const ResultsPage = ({ result, onRestart }: ResultsPageProps) => {
               En savoir plus sur Datakö
             </Button>
           </motion.div>
+
+          {/* Download bottom */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.65 }}
+            className="mt-6 text-center no-print"
+          >
+            <Button variant="outline" className="border-border" onClick={() => window.print()}>
+              <Download className="mr-2 h-4 w-4" />
+              Télécharger mon diagnostic
+            </Button>
+          </motion.div>
         </div>
       </main>
+
+      {/* Dialog scoring */}
+      <Dialog open={scoringOpen} onOpenChange={setScoringOpen}>
+        <DialogContent className="bg-card border-border max-w-md">
+          <DialogHeader>
+            <DialogTitle>Comment ce score est calculé ?</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-6 pt-2">
+            <div>
+              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+                3 axes évalués
+              </h3>
+              <div className="space-y-3">
+                {[
+                  { label: 'Données', pct: 40, desc: 'Qualité, centralisation, accessibilité' },
+                  { label: 'Pilotage', pct: 40, desc: 'KPIs, tableaux de bord, décisions data-driven' },
+                  { label: 'Automatisation', pct: 20, desc: 'Processus automatisés, maturité IA' },
+                ].map((ax) => (
+                  <div key={ax.label} className="space-y-1">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium">{ax.label}</span>
+                      <span className="text-sm font-semibold">{ax.pct}%</span>
+                    </div>
+                    <div className="relative h-2 bg-muted rounded-full overflow-hidden">
+                      <div
+                        className="absolute left-0 top-0 h-full progress-gradient rounded-full"
+                        style={{ width: `${ax.pct}%` }}
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground">{ax.desc}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+                Niveaux de maturité
+              </h3>
+              <div className="space-y-2">
+                {[
+                  { label: 'Débutant',      range: '0–39%',    color: 'text-orange-400' },
+                  { label: 'Intermédiaire', range: '40–64%',   color: 'text-blue-400' },
+                  { label: 'Avancé',        range: '65–84%',   color: 'text-green-400' },
+                  { label: 'Expert',        range: '85–100%',  color: 'text-purple-400' },
+                ].map((lvl) => (
+                  <div key={lvl.label} className="flex justify-between items-center">
+                    <span className={cn('text-sm font-medium', lvl.color)}>{lvl.label}</span>
+                    <span className="text-sm text-muted-foreground">{lvl.range}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <p className="text-xs text-muted-foreground border-t border-border pt-4">
+              Ce score vise à identifier vos priorités, pas à vous noter.
+            </p>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Footer */}
       <footer className="py-6 px-8 border-t border-border">
