@@ -113,7 +113,7 @@ export const handler = async (event: NetlifyEvent): Promise<NetlifyResponse> => 
     const [{ data: diag, error: diagErr }, { data: answers, error: answErr }] = await Promise.all([
       supabase
         .from('diagnostics')
-        .select('id, total_score, maturity_level, status, completed_at, axis_scores, organization_id, respondent_id, crm_status, internal_notes')
+        .select('id, total_score, maturity_level, status, completed_at, axis_scores, organization_id, respondent_id, crm_status, internal_notes, additional_need')
         .eq('id', params.id)
         .single(),
       supabase
@@ -150,6 +150,7 @@ export const handler = async (event: NetlifyEvent): Promise<NetlifyResponse> => 
           axis_scores: d.axis_scores,
           crm_status: d.crm_status ?? 'new',
           internal_notes: d.internal_notes ?? null,
+          additional_need: d.additional_need ?? null,
           organizations: org,
           respondents: respondent,
           answers: answErr ? [] : (answers ?? []),
