@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { AdminDiagnosticRow, CRM_STATUS_CONFIG, CrmStatus } from '@/types/diagnostic';
@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { Download, Eye, Trash2, Loader2 } from 'lucide-react';
@@ -93,6 +94,62 @@ const AdminTable = ({ data, onView, onDeleteAll, password }: AdminTableProps) =>
   const [confirmText, setConfirmText] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
 
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [showHardDeleteDialog, setShowHardDeleteDialog] = useState(false);
+  const [confirmHardText, setConfirmHardText] = useState('');
+  const [isHardDeleting, setIsHardDeleting] = useState(false);
+
+  const deletedRows = data.filter((d) => !!d.deleted_at);
+  const hasDeletedRows = deletedRows.length > 0;
+  const allDeletedSelected = deletedRows.length > 0 && deletedRows.every((d) => selectedIds.has(d.id));
+
+  // Reset selection when data changes
+  useEffect(() => {
+    setSelectedIds((prev) => {
+      const dataIds = new Set(data.map((d) => d.id));
+      const next = new Set([...prev].filter((id) => dataIds.has(id)));
+      return next.size === prev.size ? prev : next;
+    });
+  }, [data]);
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (allDeletedSelected) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(deletedRows.map((d) => d.id)));
+    }
+  };
+
+  const handleHardDeleteSelected = async () => {
+    const ids = [...selectedIds];
+    setIsHardDeleting(true);
+    try {
+      const res = await fetch('/.netlify/functions/admin-diagnostics', {
+        method: 'DELETE',
+        headers: { 'x-admin-password': password, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids, permanent: true }),
+      });
+      if (!res.ok) throw new Error('Hard delete failed');
+      toast.success(`${ids.length} diagnostic${ids.length !== 1 ? 's' : ''} supprimé${ids.length !== 1 ? 's' : ''} définitivement`);
+      setSelectedIds(new Set());
+      onDeleteAll(ids);
+    } catch {
+      toast.error('Erreur lors de la suppression définitive');
+    } finally {
+      setIsHardDeleting(false);
+      setShowHardDeleteDialog(false);
+      setConfirmHardText('');
+    }
+  };
+
   const handleDeleteAll = async () => {
     const ids = data.filter((d) => !d.deleted_at).map((d) => d.id);
     setIsDeleting(true);
@@ -121,7 +178,18 @@ const AdminTable = ({ data, onView, onDeleteAll, password }: AdminTableProps) =>
       <p className="text-sm text-muted-foreground">
         {data.length} diagnostic{data.length !== 1 ? 's' : ''}
       </p>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 flex-wrap">
+        {selectedIds.size > 0 && (
+          <Button
+            variant="destructive"
+            size="sm"
+            onClick={() => { setConfirmHardText(''); setShowHardDeleteDialog(true); }}
+            className="gap-2"
+          >
+            <Trash2 className="h-4 w-4" />
+            Supprimer définitivement ({selectedIds.size})
+          </Button>
+        )}
         <Button variant="outline" size="sm" onClick={() => exportCSV(data)} disabled={data.length === 0} className="gap-2">
           <Download className="h-4 w-4" />
           Exporter CSV
@@ -143,6 +211,15 @@ const AdminTable = ({ data, onView, onDeleteAll, password }: AdminTableProps) =>
       <Table>
         <TableHeader>
           <TableRow>
+            {hasDeletedRows && (
+              <TableHead className="w-[40px]" onClick={(e) => e.stopPropagation()}>
+                <Checkbox
+                  checked={allDeletedSelected}
+                  onCheckedChange={toggleSelectAll}
+                  aria-label="Tout sélectionner"
+                />
+              </TableHead>
+            )}
             <TableHead>Date</TableHead>
             <TableHead>Entreprise</TableHead>
             <TableHead className="hidden md:table-cell">Secteur</TableHead>
@@ -156,7 +233,7 @@ const AdminTable = ({ data, onView, onDeleteAll, password }: AdminTableProps) =>
         <TableBody>
           {data.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+              <TableCell colSpan={hasDeletedRows ? 9 : 8} className="text-center py-8 text-muted-foreground">
                 Aucun diagnostic trouvé
               </TableCell>
             </TableRow>
@@ -164,9 +241,20 @@ const AdminTable = ({ data, onView, onDeleteAll, password }: AdminTableProps) =>
             data.map((row) => (
               <TableRow
                 key={row.id}
-                className={`cursor-pointer hover:bg-muted/50 ${row.deleted_at ? 'opacity-50' : ''}`}
+                className={`cursor-pointer hover:bg-muted/50 ${row.deleted_at ? 'opacity-60' : ''} ${selectedIds.has(row.id) ? 'bg-muted/40' : ''}`}
                 onClick={() => onView(row)}
               >
+                {hasDeletedRows && (
+                  <TableCell onClick={(e) => e.stopPropagation()}>
+                    {row.deleted_at && (
+                      <Checkbox
+                        checked={selectedIds.has(row.id)}
+                        onCheckedChange={() => toggleSelect(row.id)}
+                        aria-label="Sélectionner"
+                      />
+                    )}
+                  </TableCell>
+                )}
                 <TableCell className="whitespace-nowrap text-sm">
                   {row.completed_at ? format(new Date(row.completed_at), 'dd/MM/yyyy', { locale: fr }) : '—'}
                 </TableCell>
@@ -207,6 +295,35 @@ const AdminTable = ({ data, onView, onDeleteAll, password }: AdminTableProps) =>
       </Table>
     </div>
     </div>
+
+    <AlertDialog open={showHardDeleteDialog} onOpenChange={(open) => { setShowHardDeleteDialog(open); if (!open) setConfirmHardText(''); }}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Suppression définitive</AlertDialogTitle>
+          <AlertDialogDescription>
+            Vous allez supprimer <strong>{selectedIds.size}</strong> diagnostic{selectedIds.size !== 1 ? 's' : ''} de façon irréversible. Cette action ne peut pas être annulée.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <div className="px-1 py-2">
+          <Input
+            placeholder="Tapez SUPPRIMER pour confirmer"
+            value={confirmHardText}
+            onChange={(e) => setConfirmHardText(e.target.value)}
+          />
+        </div>
+        <AlertDialogFooter>
+          <AlertDialogCancel disabled={isHardDeleting}>Annuler</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={handleHardDeleteSelected}
+            disabled={confirmHardText !== 'SUPPRIMER' || isHardDeleting}
+            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+          >
+            {isHardDeleting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+            Supprimer définitivement
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
 
     <AlertDialog open={showDeleteAll} onOpenChange={(open) => { setShowDeleteAll(open); if (!open) setConfirmText(''); }}>
       <AlertDialogContent>
