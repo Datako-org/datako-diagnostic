@@ -36,7 +36,7 @@ export const ResultsPage = ({ result, onRestart }: ResultsPageProps) => {
       `- Automatisation : ${result.dimensionScores.find(d => d.dimension === 'automation')?.percentage || 0}%\n\n` +
       `Cordialement`
     );
-    window.open(`mailto:contact@datako.com?subject=${subject}&body=${body}`, '_blank');
+    window.open(`mailto:contact@datakö.com?subject=${subject}&body=${body}`, '_blank');
   };
 
   const handleContactWhatsApp = () => {
