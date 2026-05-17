@@ -174,7 +174,7 @@
   .gradient-datako-text { color: #7c3aed !important; -webkit-text-fill-color: #7c3aed !important; }
 
   main::after {
-    content: "Datakö  •  contact@datako.com";
+    content: "Datakö  •  contact@datakö.com";
     display: block;
     text-align: center;
     margin-top: 2rem;

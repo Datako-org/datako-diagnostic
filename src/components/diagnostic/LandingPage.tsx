@@ -14,7 +14,7 @@ export const LandingPage = ({ onStart }: LandingPageProps) => {
       <header className="w-full py-6 px-4 sm:px-8">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <a
-            href="https://datako.com"
+            href="https://datakö.com"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-3 p-2 -m-2 rounded-lg transition-all duration-200 hover:opacity-80 hover:scale-[1.02]"
